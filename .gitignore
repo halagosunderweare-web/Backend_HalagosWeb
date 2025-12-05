@@ -1,0 +1,14 @@
+# === Node ===
+node_modules/
+.env
+.env.*
+dist/
+build/
+
+# === MongoDB ===
+mongodb_data/
+*.wt
+*.lock
+*.log
+journal/
+diagnostic.data/
