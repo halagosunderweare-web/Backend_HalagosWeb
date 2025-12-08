@@ -1,4 +1,3 @@
-// index.js  F6vV9pASf6vFNKng   halagosunderweare-admin   Halagosunderweare123.
 // index.js  
 import express from "express";
 import cors from "cors";
@@ -15,7 +14,14 @@ import metricsRoutes from "./routes/metrics.js";
 const PORT = process.env.PORT || 5000; // 👈 Render necesita esto
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://frontend-halagos-web.vercel.app/",
+    "http://localhost:5173" // por si pruebas local
+  ],
+  credentials: true
+}));
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
@@ -44,3 +50,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
+
