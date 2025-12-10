@@ -14,8 +14,6 @@ import metricsRoutes from "./routes/metrics.js";
 const PORT = process.env.PORT || 5000; // 👈 Render necesita esto
 const app = express();
 
-app.options("*", cors());
-
 app.use(cors({
   origin: ["https://halagos.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -23,6 +21,7 @@ app.use(cors({
   credentials: true
 }));
 
+app.options("*", cors());
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
