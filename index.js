@@ -16,8 +16,8 @@ const app = express();
 
 app.use(cors({
   origin: [
-    "https://frontend-halagos-web.vercel.app/",
-    "http://localhost:5173" // por si pruebas local
+    "http://localhost:5173", // por si pruebas local
+    "https://frontend-halagos-web.vercel.app" 
   ],
   credentials: true
 }));
