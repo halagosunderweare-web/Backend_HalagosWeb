@@ -15,12 +15,10 @@ const PORT = process.env.PORT || 5000; // 👈 Render necesita esto
 const app = express();
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173", // por si pruebas local
-    "https://frontend-halagos-web.vercel.app" 
-  ],
+  origin: ["https://halagos.vercel.app"],
   credentials: true
 }));
+
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
