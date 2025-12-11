@@ -11,4 +11,7 @@ router.post('/login', loginController);
 // esta la agregue porque no me salia mi token sjjsjsjs
 router.get('/verify', authenticateToken, verifyTokenController); 
 
+// ruta que EL FRONTEND ESTÁ BUSCANDO
+router.get('/validate-token', authenticateToken, verifyTokenController);
+
 export default router;
