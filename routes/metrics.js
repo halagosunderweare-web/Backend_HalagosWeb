@@ -12,9 +12,7 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
 });
 
 /* ============================================================
-   🔥 MÉTRICAS PRINCIPALES (overview)
-   - sesiones totales
-   - vistas totales
+    MÉTRICAS PRINCIPALES 
    ============================================================ */
 router.get("/overview", async (req, res) => {
   try {
@@ -27,18 +25,30 @@ router.get("/overview", async (req, res) => {
       ],
     });
 
-    const sessions = Number(response.rows[0].metricValues[0].value);
-    const pageViews = Number(response.rows[0].metricValues[1].value);
+    // Si GA4 no regresa datos, devolvemos ceros para evitar crasheo
+    if (!response.rows || response.rows.length === 0) {
+      return res.json({
+        sessions: 0,
+        pageViews: 0
+      });
+    }
+
+    const row = response.rows[0];
+
+    const sessions = Number(row.metricValues[0]?.value || 0);
+    const pageViews = Number(row.metricValues[1]?.value || 0);
 
     res.json({ sessions, pageViews });
+
   } catch (err) {
     console.error("❌ Error en /overview:", err);
     res.status(500).json({ error: "Error retrieving GA4 metrics" });
   }
 });
 
+
 /* ============================================================
-   🔥 PRODUCTOS MÁS VISTOS
+   PRODUCTOS MÁS VISTOS
    ============================================================ */
 router.get("/top-products", async (req, res) => {
   try {
@@ -73,7 +83,7 @@ router.get("/top-products", async (req, res) => {
 });
 
 /* ============================================================
-   🔥 VISITAS POR DÍA (PARA RECHARTS)
+    VISITAS POR DÍA (PARA RECHARTS)
    ============================================================ */
 router.get("/visits-by-day", async (req, res) => {
   try {
