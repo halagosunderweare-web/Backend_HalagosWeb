@@ -18,7 +18,7 @@ app.use(cors({
   origin: ["https://halagos.vercel.app",
            "https://halagos-git-main-halagos-projects.vercel.app",
            "https://halagos-jjdjge619-halagos-projects.vercel.app",
-           "http://localhost:5173" // para desarrollo],
+           "http://localhost:5173"]
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
