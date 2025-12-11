@@ -1,3 +1,5 @@
+
+// metrics.js
 import express from "express";
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 import path from "path";
@@ -12,7 +14,7 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
 });
 
 /* ============================================================
-    MÉTRICAS PRINCIPALES 
+    MÉTRICAS PRINCIPALES (overview)
    ============================================================ */
 router.get("/overview", async (req, res) => {
   try {
@@ -48,7 +50,7 @@ router.get("/overview", async (req, res) => {
 
 
 /* ============================================================
-   PRODUCTOS MÁS VISTOS
+    PRODUCTOS MÁS VISTOS
    ============================================================ */
 router.get("/top-products", async (req, res) => {
   try {
@@ -66,21 +68,27 @@ router.get("/top-products", async (req, res) => {
       ],
     });
 
+    if (!response.rows || response.rows.length === 0) {
+      return res.json([]);
+    }
+
     const filtered = response.rows
-      .filter((row) => row.dimensionValues[0].value.startsWith("/producto/"))
+      .filter((row) => row?.dimensionValues?.[0]?.value?.startsWith("/producto/"))
       .slice(0, 4)
       .map((row) => ({
         url: row.dimensionValues[0].value,
-        views: Number(row.metricValues[0].value),
+        views: Number(row.metricValues?.[0]?.value || 0),
         id: row.dimensionValues[0].value.split("/")[2],
       }));
 
     res.json(filtered);
+
   } catch (err) {
     console.error("❌ Error en /top-products:", err);
-    res.status(500).json({ error: "Error retrieving GA4 product metrics" });
+    res.status(200).json([]); // evita caída del frontend
   }
 });
+
 
 /* ============================================================
     VISITAS POR DÍA (PARA RECHARTS)
@@ -107,17 +115,18 @@ router.get("/visits-by-day", async (req, res) => {
       ],
     });
 
-    const rows = response.rows || [];
+    const rows = response?.rows || [];
 
     const data = rows.map((r) => ({
-      date: r.dimensionValues[0].value, // YYYYMMDD
-      visits: Number(r.metricValues[0].value),
+      date: r.dimensionValues?.[0]?.value || "00000000",
+      visits: Number(r.metricValues?.[0]?.value || 0),
     }));
 
     res.json(data);
+
   } catch (err) {
     console.error("❌ Error en /visits-by-day:", err);
-    res.status(500).json({ error: "Failed to fetch visits by day" });
+    res.status(200).json([]); // evita crasheo del panel
   }
 });
 
