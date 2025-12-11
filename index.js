@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000; // 👈 Render necesita esto
 const app = express();
 
 app.use(cors({
-  origin: ["https://halagos.vercel.app"],
+  origin: ["https://halagos.vercel.app", ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
