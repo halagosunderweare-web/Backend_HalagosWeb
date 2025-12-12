@@ -1,16 +1,29 @@
-
 // metrics.js
 import express from "express";
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
-import path from "path";
 
 const router = express.Router();
 
 const PROPERTY_ID = "510927002";
 
+// Construimos el JSON desde variables de entorno
+const gaCredentials = {
+  type: process.env.GA_TYPE,
+  project_id: process.env.GA_PROJECT_ID,
+  private_key_id: process.env.GA_PRIVATE_KEY_ID,
+  private_key: process.env.GA_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  client_email: process.env.GA_CLIENT_EMAIL,
+  client_id: process.env.GA_CLIENT_ID,
+  auth_uri: process.env.GA_AUTH_URI,
+  token_uri: process.env.GA_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.GA_AUTH_PROVIDER_CERT_URL,
+  client_x509_cert_url: process.env.GA_CLIENT_CERT_URL,
+  universe_domain: process.env.GA_UNIVERSE_DOMAIN,
+};
+
 // Cliente GA4
 const analyticsDataClient = new BetaAnalyticsDataClient({
-  keyFilename: path.join(process.cwd(), "credentials/ga-service-account.json"),
+  credentials: gaCredentials,
 });
 
 /* ============================================================
@@ -27,7 +40,6 @@ router.get("/overview", async (req, res) => {
       ],
     });
 
-    // Si GA4 no regresa datos, devolvemos ceros para evitar crasheo
     if (!response.rows || response.rows.length === 0) {
       return res.json({
         sessions: 0,
@@ -37,10 +49,10 @@ router.get("/overview", async (req, res) => {
 
     const row = response.rows[0];
 
-    const sessions = Number(row.metricValues[0]?.value || 0);
-    const pageViews = Number(row.metricValues[1]?.value || 0);
-
-    res.json({ sessions, pageViews });
+    res.json({
+      sessions: Number(row.metricValues[0]?.value || 0),
+      pageViews: Number(row.metricValues[1]?.value || 0),
+    });
 
   } catch (err) {
     console.error("❌ Error en /overview:", err);
@@ -85,13 +97,13 @@ router.get("/top-products", async (req, res) => {
 
   } catch (err) {
     console.error("❌ Error en /top-products:", err);
-    res.status(200).json([]); // evita caída del frontend
+    res.status(200).json([]);
   }
 });
 
 
 /* ============================================================
-    VISITAS POR DÍA (PARA RECHARTS)
+    VISITAS POR DÍA
    ============================================================ */
 router.get("/visits-by-day", async (req, res) => {
   try {
@@ -126,7 +138,7 @@ router.get("/visits-by-day", async (req, res) => {
 
   } catch (err) {
     console.error("❌ Error en /visits-by-day:", err);
-    res.status(200).json([]); // evita crasheo del panel
+    res.status(200).json([]);
   }
 });
 
