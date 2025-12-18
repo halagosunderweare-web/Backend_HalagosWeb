@@ -1,4 +1,5 @@
 // metrics.js
+// metrics.js
 import express from "express";
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
@@ -55,7 +56,7 @@ router.get("/overview", async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Error en /overview:", err);
+    console.error("Error en /overview:", err);
     res.status(500).json({ error: "Error retrieving GA4 metrics" });
   }
 });
@@ -85,18 +86,31 @@ router.get("/top-products", async (req, res) => {
     }
 
     const filtered = response.rows
-      .filter((row) => row?.dimensionValues?.[0]?.value?.startsWith("/producto/"))
-      .slice(0, 4)
-      .map((row) => ({
-        url: row.dimensionValues[0].value,
-        views: Number(row.metricValues?.[0]?.value || 0),
-        id: row.dimensionValues[0].value.split("/")[2],
-      }));
+      .filter(
+        (row) =>
+          row?.dimensionValues?.[0]?.value?.startsWith("/producto/")
+      )
+      .map((row) => {
+        const path = row.dimensionValues[0].value;
+
+        // 🔑 limpiar ID correctamente
+        const id = path
+          .replace("/producto/", "")
+          .split("?")[0]
+          .replace("/", "");
+
+        return {
+          url: path,
+          views: Number(row.metricValues?.[0]?.value || 0),
+          id,
+        };
+      })
+      .slice(0, 4);
 
     res.json(filtered);
 
   } catch (err) {
-    console.error("❌ Error en /top-products:", err);
+    console.error("Error en /top-products:", err);
     res.status(200).json([]);
   }
 });
@@ -137,7 +151,7 @@ router.get("/visits-by-day", async (req, res) => {
     res.json(data);
 
   } catch (err) {
-    console.error("❌ Error en /visits-by-day:", err);
+    console.error("Error en /visits-by-day:", err);
     res.status(200).json([]);
   }
 });
